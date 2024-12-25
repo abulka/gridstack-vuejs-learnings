@@ -23,7 +23,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 // import GridStack from '../dist/gridstack-all.js';
-import 'gridstack/dist/gridstack.min.css';
+
 import { GridStack } from 'gridstack';
 
 let count = ref(0);
