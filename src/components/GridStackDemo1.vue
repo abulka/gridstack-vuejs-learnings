@@ -15,7 +15,7 @@
             to let Vue deal with DOM rendering.
         </p>
         <button type="button"
-            @click="addNewWidget">Add Widget</button> {{ info }}
+            @click="addNewWidget">Add Widget</button> <span class="info">{{ info }}</span>
         <div class="grid-stack"></div>
     </main>
 </template>
@@ -28,6 +28,7 @@ import { GridStack } from 'gridstack';
 
 let count = ref(0);
 let info = ref("");
+let timerId = null;
 let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
 const items = [
     { x: 2, y: 1, h: 2 },
@@ -41,7 +42,11 @@ onMounted(() => {
     grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
         float: true,
         cellHeight: "70px",
-        minRow: 1,
+        minRow: 2, // how big the initial canvas is
+        alwaysShowResizeHandle: false,
+        cellHeight: 'auto',
+        float: true,  // false means float everything to the top
+        margin: 10,
     });
 
     grid.on("dragstop", function (event, element) {
@@ -57,20 +62,27 @@ function addNewWidget() {
         w: Math.round(1 + 3 * Math.random()),
         h: Math.round(1 + 3 * Math.random()),
     };
-    node.id = node.content = String(count.value++);
+    node.id = String(count.value++)
+    node.content = node.id
+    // node.content = "<b>hooray</b>"; // why doesnt this work? https://github.com/gridstack/gridstack.js/tree/master/doc#item-attributes 
     grid.addWidget(node);
 }
 
 watch(info, (newVal) => {
     if (newVal.length === 0) return;
 
-    window.clearTimeout(this.timerId);
-    this.timerId = window.setTimeout(() => {
+    window.clearTimeout(timerId);
+    timerId = window.setTimeout(() => {
         info.value = "";
     }, 2000);
 });
 </script>
 
 <style scoped>
-@import '@/assets/demo.css';
+.info {
+    background-color: yellow;
+    color: black;
+    font-size: 0.8em;
+    margin-left: 1em;
+}
 </style>
