@@ -1,6 +1,6 @@
 <!-- filepath: /Users/andy/Devel/toolback-project/gridstack.js/demo/Vue3Gridstack.vue -->
 <template>
-    <main id="app">
+    <!-- <main id="app"> -->
         <h1>How to integrate GridStack.js with Vue.js</h1>
         <p>
             As with any virtual DOM based framework, you need to check if Vue has
@@ -16,15 +16,15 @@
         </p>
         <button type="button"
             @click="addNewWidget">Add Widget</button> <span class="info">{{ info }}</span>
-        <div class="grid-stack"></div>
-    </main>
+        <p>demo 1 gridstack goes here:</p>
+        <div class="grid-stack" id="demo1-grid"></div>
+    <!-- </main> -->
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-// import GridStack from '../dist/gridstack-all.js';
-
 import { GridStack } from 'gridstack';
+// import '../assets/demo.css' // or import it in the style section below
 
 let count = ref(0);
 let info = ref("");
@@ -79,9 +79,12 @@ watch(info, (newVal) => {
 });
 </script>
 
-<style scoped>
+<style>
+/* cannot have scoped or else you see nothing 
+alternatively import the styles in the script section. */
+@import '../assets/demo.css';
 .info {
-    background-color: yellow;
+    background-color: pink;
     color: black;
     font-size: 0.8em;
     margin-left: 1em;

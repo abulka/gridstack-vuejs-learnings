@@ -9,10 +9,10 @@ import GridStackDemo2 from './components/GridStackDemo2.vue'
 
 <template>
   <main>
+    <!-- <GridStackDemo1 /> -->
     <GridStackDemo2 />
     <!-- <LayoutDemo1 /> -->
     <!-- <TheWelcome /> -->
-    <GridStackDemo1 />
   </main>
 </template>
 
