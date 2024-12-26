@@ -3,13 +3,14 @@ import { h, onMounted, render, watchEffect, ref } from 'vue'
 import { GridStack } from 'gridstack';
 import DemoBlank from './DemoBlank1.vue'
 import { type GridStackNode } from 'gridstack';
+import DemoImage from './DemoImage.vue';
 
 let grid: GridStack | null = null;
 
 const items = [
-    { x: 5, y: 1, w: 2, h: 2, id: '0' },
-    { x: 2, y: 4, w: 3, h: 2, id: '1' },
-    { x: 4, y: 2, w: 2, h: 2, id: '2' },
+    { x: 5, y: 1, w: 2, h: 2, id: '0', kind: DemoBlank },
+    { x: 2, y: 4, w: 3, h: 2, id: '1', kind: 'div' },
+    { x: 4, y: 2, w: 2, h: 2, id: '2', kind: DemoImage },
     { x: 3, y: 1, h: 2, id: '3' },
     { x: 0, y: 0, w: 2, h: 2, id: '4' },
 ];
@@ -63,7 +64,7 @@ onMounted(() => {
 function addHandler(items: GridStackNode[]) {
     console.log(`addHandler, items`, items)
     for (const item of items) {
-        console.log(`is this a node?`, item, item.content)
+        // console.log(`is this a node?`, item, item.content)
         const itemEl = item.el as HTMLElement
         const itemElContent = itemEl.querySelector('.grid-stack-item-content') as HTMLElement
 
@@ -75,9 +76,11 @@ function addHandler(items: GridStackNode[]) {
         }
         console.log(`${widgetId} added`)
 
+        const kind = item.kind ? item.kind : DemoBlank
+
         // dynamically render a vue component, and append it to the grid stack item content
         // https://vuejs.org/guide/extras/render-function.html
-        const widgetNode = h(DemoBlank, { widgetId })
+        const widgetNode = h(kind, { widgetId })
         render(widgetNode, itemElContent)
     }
 }
@@ -103,6 +106,7 @@ function addNewWidget() {
 
     <!-- <div class="grid-stack grow shrink-0 w-full h-full" id="demo2-grid"></div> -->
     <div class="grid-stack"></div>
+    <DemoImage imageUrl="/flowers.png" />
 </template>
 
 <style>
