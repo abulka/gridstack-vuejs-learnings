@@ -64,6 +64,7 @@ function addNewWidget() {
     };
     node.id = String(count.value++)
     node.content = node.id
+    // node.content = '<button type="button" @click="addNewWidget">Add Widget</button>'
     // node.content = "<b>hooray</b>"; // why doesnt this work? https://github.com/gridstack/gridstack.js/tree/master/doc#item-attributes 
     grid.addWidget(node);
 }

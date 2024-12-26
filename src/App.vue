@@ -2,10 +2,15 @@
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import GridStackDemo1 from './components/GridStackDemo1.vue'
+import GridStackDemo2 from './components/GridStackDemo2.vue'
+// import LayoutDemo1 from './components/LayoutDemo1.vue'
+
 </script>
 
 <template>
   <main>
+    <GridStackDemo2 />
+    <!-- <LayoutDemo1 /> -->
     <!-- <TheWelcome /> -->
     <GridStackDemo1 />
   </main>
