@@ -14,8 +14,7 @@ const handleClick = () => {
 
 <style scoped>
 .widget {
-    width: 200px;
-    height: 200px;
+    height: 100%;
     background-color: red;
     display: flex;
     justify-content: center;
