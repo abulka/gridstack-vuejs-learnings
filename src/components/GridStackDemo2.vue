@@ -2,7 +2,7 @@
 import { h, onMounted, render, watchEffect } from 'vue'
 import { GridStack } from 'gridstack';
 import DemoBlank from './DemoBlank1.vue'
-import { GridStackEngine, GridStackNode, GridStackMoveOpts } from 'gridstack';
+import { type GridStackNode } from 'gridstack';
 
 let grid: GridStack | null = null;
 
