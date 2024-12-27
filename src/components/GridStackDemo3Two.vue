@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import { GridStack, type GridStackNode, Utils } from 'gridstack'
 import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
-// import 'gridstack/dist/gridstack.min.css'; // already done in main.ts
 
 // Types
 interface SidebarItem extends GridStackNode {
@@ -10,9 +9,6 @@ interface SidebarItem extends GridStackNode {
   id?: string
 }
 
-// State
-// const leftGrid = ref<GridStack | null>(null)
-// const rightGrid = ref<GridStack | null>(null)
 let leftGrid: GridStack | null = null;
 let rightGrid: GridStack | null = null;
 
@@ -37,7 +33,7 @@ const sidebarContent: SidebarItem[] = [
 
 // Grid options
 const gridOptions: GridStackOptions = {
-  // column: 6, // ❌ CHANGING THIS away from 12 BROKE THE WIDTH OF EACH ITEM, AND NO ITEM CONTENT CREATED TOO 
+  // column: 6, // ❌ CHANGING THIS away from 12 BROKE ITEM VISIBILITY
   minRow: 1,
   cellHeight: 70,
   float: true,
@@ -164,19 +160,10 @@ onMounted(() => {
 
   // Add events to both grids
   grids.forEach((grid, i) => addGridEvents(grid, i))
-
-  const loadedNodes = leftGrid.engine.nodes || []; // Get loaded nodes
-  // console.log('loadedNodes', loadedNodes);  
 })
 </script>
 
 <template>
-  <!-- <div class="grid-stack"
-    id="left_grid"></div>
-  <br>
-  <div class="grid-stack"
-    id="right_grid"></div> -->
-
   <div class="grid-demo">
     <h1>Two Grids Demo</h1>
     <p>
@@ -191,7 +178,7 @@ onMounted(() => {
           <div class="sidebar-item">Drag me</div>
           <div class="sidebar-item">2x1, max=3</div>
           <div class="sidebar-item"
-            :gridstacknode='{ "w": 3, "content": "w:3" }'>w:3</div>
+            gridstacknode='{ "w": 3, "content": "w:3" }'>w:3</div>
           <div class="sidebar-item"
             gs-id="manual">gs-id case</div>
           <div class="grid-stack-item"
@@ -199,7 +186,7 @@ onMounted(() => {
             <div class="grid-stack-item-content">DOM gs-w:3</div>
           </div>
           <div class="grid-stack-item"
-            :gridstacknode='{ "w": 2 }'>
+            gridstacknode='{ "w": 2 }'>
             <div class="grid-stack-item-content">DOM w:2</div>
           </div>
         </div>
