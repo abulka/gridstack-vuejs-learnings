@@ -26,7 +26,7 @@ setInterval(() => {
 <style scoped>
 .widget {
     height: 100%;
-    background-color: red;
+    background-color: darkseagreen;
     display: flex;
     flex-direction: column; /* Arrange children in a column */
     justify-content: center;
@@ -34,7 +34,11 @@ setInterval(() => {
 }
 
 button {
-    padding: 10px 20px;
+    /* padding: 10px 20px; */
     font-size: 16px;
+}
+
+h3 {
+    margin: 0;
 }
 </style>

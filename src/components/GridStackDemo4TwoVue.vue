@@ -3,11 +3,13 @@ import { onMounted, ref, h, render } from 'vue'
 import { GridStack, type GridStackNode, Utils } from 'gridstack'
 import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
 import DemoBlank from './DemoBlank1.vue'
+import DemoImage from './DemoImage.vue'
 
 // Types
 interface SidebarItem extends GridStackNode {
   content: string
   id?: string
+  kind?: any
 }
 
 let leftGrid: GridStack | null = null;
@@ -32,6 +34,10 @@ const sidebarContent: SidebarItem[] = [
   { content: 'max=3', w: 2, h: 1, maxW: 3 },
   // andy
   { content: 'dropped', id: 'fred_id' },
+  // you can supply content in gridstacknode attribute as well
+  { content: 'dropped', kind: DemoImage, id: 'mary_id' },
+  { content: 'dropped', kind: DemoBlank, id: 'sam_id', w: 4, h: 3 },
+  { content: 'dropped', kind: DemoImage, id: 'jo_id' }
 ]
 
 // Grid options
@@ -207,7 +213,7 @@ onMounted(() => {
 
 <template>
   <div class="grid-demo">
-    <h1>Two Grids Demo</h1>
+    <h1>Two Grids Demo - vue components</h1>
     <p>
       Two grids, one floating one not, showing drag &amp; drop from sidebar and between grids.
       <br>
@@ -222,6 +228,8 @@ onMounted(() => {
 <!-- andy -->
           <div class="sidebar-item">Drag me2</div>
           <div class="sidebar-item" gs-id="mary">Drag me3</div>
+          <div class="sidebar-item"
+            gridstacknode='{ "id": "meee", "h": 3, "w": 4, "content": "me4" }'>Drag me4</div>
 
 <!-- andy ends -->
           <div class="sidebar-item"
