@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { GridStack, type GridStackNode, Utils } from 'gridstack'
-import type { GridStackOptions } from 'gridstack'
+import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
+// import 'gridstack/dist/gridstack.min.css'; // already done in main.ts
 
 // Types
 interface SidebarItem extends GridStackNode {
@@ -10,8 +11,11 @@ interface SidebarItem extends GridStackNode {
 }
 
 // State
-const leftGrid = ref<GridStack | null>(null)
-const rightGrid = ref<GridStack | null>(null)
+// const leftGrid = ref<GridStack | null>(null)
+// const rightGrid = ref<GridStack | null>(null)
+let leftGrid: GridStack | null = null;
+let rightGrid: GridStack | null = null;
+
 const leftGridFloat = ref(true)
 const rightGridFloat = ref(false)
 
@@ -33,7 +37,7 @@ const sidebarContent: SidebarItem[] = [
 
 // Grid options
 const gridOptions: GridStackOptions = {
-  column: 6,
+  // column: 6, // ❌ CHANGING THIS away from 12 BROKE THE WIDTH OF EACH ITEM, AND NO ITEM CONTENT CREATED TOO 
   minRow: 1,
   cellHeight: 70,
   float: true,
@@ -45,31 +49,90 @@ const gridOptions: GridStackOptions = {
 
 // Helper function for cloning sidebar items
 function myClone(el: HTMLElement): HTMLElement {
+  console.log('myClone', el)
   if (el.getAttribute('gs-id') === 'manual') {
     return Utils.createWidgetDivs(undefined, { w: 2, content: 'manual' })
   }
   return el.cloneNode(true) as HTMLElement
 }
 
-// Grid event handler
-function addGridEvents(grid: GridStack, index: number) {
-  grid.on('added removed change', function(event: Event, items: GridStackNode[]) {
+// Comprehensive event handler
+function addGridEvents(grid: GridStack, id: number) {
+  const g = id !== undefined ? `grid${id} ` : ''
+
+  grid.on('added removed change', (event: Event, items: GridStackNode[]) => {
     let str = ''
-    items.forEach(function(item: GridStackNode) {
-      str += ' (x,y)=' + item.x + ',' + item.y
+    items.forEach((item) => {
+      str += ` (${item.x},${item.y} ${item.w}x${item.h})`
     })
-    console.log(`${event.type} ${index} items:${str}`)
+    console.log(`${g}${event.type} ${items.length} items (x,y w h):${str}`)
+  })
+
+  grid.on('enable', (event: Event) => {
+    console.log(`${g}enable`)
+  })
+
+  grid.on('disable', (event: Event) => {
+    console.log(`${g}disable`)
+  })
+
+  grid.on('dragstart', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const x = el.getAttribute('gs-x')
+    const y = el.getAttribute('gs-y')
+    console.log(`${g}dragstart ${n.content || ''} pos: (${n.x},${n.y}) = (${x},${y})`)
+  })
+
+  grid.on('drag', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const x = el.getAttribute('gs-x')
+    const y = el.getAttribute('gs-y')
+    // console.log(`${g}drag ${n.content || ''} pos: (${n.x},${n.y}) = (${x},${y})`)
+  })
+
+  grid.on('dragstop', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const x = el.getAttribute('gs-x')
+    const y = el.getAttribute('gs-y')
+    console.log(`${g}dragstop ${n.content || ''} pos: (${n.x},${n.y}) = (${x},${y})`)
+  })
+
+  grid.on('dropped', (event: Event, previousNode: GridStackNode | undefined, newNode: GridStackNode | undefined) => {
+    if (previousNode) {
+      console.log(`${g}dropped - Removed widget from grid:`, previousNode)
+    }
+    if (newNode) {
+      console.log(`${g}dropped - Added widget in grid:`, newNode)
+    }
+  })
+
+  grid.on('resizestart', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const rec = el.getBoundingClientRect()
+    console.log(`${g}resizestart ${n.content || ''} size: (${n.w}x${n.h}) = (${Math.round(rec.width)}x${Math.round(rec.height)})px`)
+  })
+
+  grid.on('resize', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const rec = el.getBoundingClientRect()
+    console.log(`${g}resize ${n.content || ''} size: (${n.w}x${n.h}) = (${Math.round(rec.width)}x${Math.round(rec.height)})px`)
+  })
+
+  grid.on('resizestop', (event: Event, el: GridItemHTMLElement) => {
+    const n = el.gridstackNode
+    const rec = el.getBoundingClientRect()
+    console.log(`${g}resizestop ${n.content || ''} size: (${n.w}x${n.h}) = (${Math.round(rec.width)}x${Math.round(rec.height)})px`)
   })
 }
 
 // Methods
 function toggleFloat(index: number) {
-  const grid = index === 0 ? leftGrid.value : rightGrid.value
+  const grid = index === 0 ? leftGrid : rightGrid
   if (!grid) return
-  
+
   const newFloat = !grid.getFloat()
   grid.float(newFloat)
-  
+
   if (index === 0) {
     leftGridFloat.value = newFloat
   } else {
@@ -78,7 +141,7 @@ function toggleFloat(index: number) {
 }
 
 function compact(index: number) {
-  const grid = index === 0 ? leftGrid.value : rightGrid.value
+  const grid = index === 0 ? leftGrid : rightGrid
   grid?.compact()
 }
 
@@ -86,29 +149,38 @@ function compact(index: number) {
 onMounted(() => {
   // Initialize grids
   const grids = GridStack.initAll(gridOptions)
-  leftGrid.value = grids[0]
-  rightGrid.value = grids[1]
-  
+  leftGrid = grids[0]
+  rightGrid = grids[1]
+
   // Set right grid to non-floating
-  rightGrid.value.float(false)
-  
+  rightGrid.float(false)
+
   // Setup drag-in functionality
   GridStack.setupDragIn(
     '.sidebar-item, .sidebar>.grid-stack-item',
     { helper: myClone },
     sidebarContent
   )
-  
+
   // Add events to both grids
   grids.forEach((grid, i) => addGridEvents(grid, i))
+
+  const loadedNodes = leftGrid.engine.nodes || []; // Get loaded nodes
+  // console.log('loadedNodes', loadedNodes);  
 })
 </script>
 
 <template>
+  <!-- <div class="grid-stack"
+    id="left_grid"></div>
+  <br>
+  <div class="grid-stack"
+    id="right_grid"></div> -->
+
   <div class="grid-demo">
     <h1>Two Grids Demo</h1>
     <p>
-      Two grids, one floating one not, showing drag&drop from sidebar and between grids.
+      Two grids, one floating one not, showing drag &amp; drop from sidebar and between grids.
       <br>
       Use 'Esc' to cancel any move/resize. Use 'r' to rotate as you drag.
     </p>
@@ -118,19 +190,22 @@ onMounted(() => {
         <div class="sidebar">
           <div class="sidebar-item">Drag me</div>
           <div class="sidebar-item">2x1, max=3</div>
-          <div class="sidebar-item" :gridstacknode='{"w":3, "content":"w:3"}'>w:3</div>
-          <div class="sidebar-item" gs-id="manual">gs-id case</div>
-          <div class="grid-stack-item" gs-w="3">
+          <div class="sidebar-item"
+            :gridstacknode='{ "w": 3, "content": "w:3" }'>w:3</div>
+          <div class="sidebar-item"
+            gs-id="manual">gs-id case</div>
+          <div class="grid-stack-item"
+            gs-w="3">
             <div class="grid-stack-item-content">DOM gs-w:3</div>
           </div>
-          <div class="grid-stack-item" :gridstacknode='{"w":2}'>
+          <div class="grid-stack-item"
+            :gridstacknode='{ "w": 2 }'>
             <div class="grid-stack-item-content">DOM w:2</div>
           </div>
         </div>
       </div>
       <div class="right-section">
         <div class="trash">
-          <div class="trash-icon">🗑️</div>
         </div>
       </div>
     </div>
@@ -138,36 +213,45 @@ onMounted(() => {
     <div class="grids-container">
       <div class="grid-section">
         <div class="grid-controls">
-          <button 
-            class="control-btn" 
+          <button class="control-btn"
             :class="{ 'float-active': leftGridFloat }"
-            @click="toggleFloat(0)"
-          >
+            @click="toggleFloat(0)">
             float: {{ leftGridFloat }}
           </button>
-          <button class="control-btn" @click="compact(0)">Compact</button>
+          <button class="control-btn"
+            @click="compact(0)">Compact</button>
         </div>
-        <div class="grid-stack" id="left_grid"></div>
+        <div class="grid-stack"
+          id="left_grid"></div>
       </div>
 
       <div class="grid-section">
         <div class="grid-controls">
-          <button 
-            class="control-btn" 
+          <button class="control-btn"
             :class="{ 'float-active': rightGridFloat }"
-            @click="toggleFloat(1)"
-          >
+            @click="toggleFloat(1)">
             float: {{ rightGridFloat }}
           </button>
-          <button class="control-btn" @click="compact(1)">Compact</button>
+          <button class="control-btn"
+            @click="compact(1)">Compact</button>
         </div>
-        <div class="grid-stack" id="right_grid"></div>
+        <div class="grid-stack"
+          id="right_grid"></div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
+/* cannot have scoped or else you see nothing 
+alternatively import the styles in the script section. */
+@import '../assets/demo.css';
+
+.sidebar {
+  /* override the demo.css style - looks better */
+  height: auto;
+}
+
 .grid-demo {
   padding: 20px;
   max-width: 1200px;
@@ -186,41 +270,6 @@ onMounted(() => {
 
 .right-section {
   flex: 1;
-}
-
-.sidebar {
-  background: rgba(144, 238, 144, 0.2);
-  padding: 15px;
-  border-radius: 4px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.sidebar-item {
-  background: rgb(102, 187, 152);
-  color: white;
-  padding: 10px;
-  border-radius: 4px;
-  cursor: move;
-  min-width: 100px;
-  text-align: center;
-  border: 2px dashed rgba(0, 0, 0, 0.1);
-}
-
-.trash {
-  background: rgba(255, 192, 192, 0.2);
-  min-height: 100px;
-  border: 2px dashed rgba(255, 0, 0, 0.3);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.trash-icon {
-  font-size: 24px;
-  opacity: 0.5;
 }
 
 .grids-container {
@@ -254,29 +303,4 @@ onMounted(() => {
   background: #45a049;
 }
 
-.grid-stack {
-  background: rgba(255, 255, 224, 0.6);
-  border-radius: 4px;
-  min-height: 400px;
-}
-
-.grid-stack-item-content {
-  background: rgb(102, 187, 152);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-/* GridStack specific styles */
-.grid-stack > .grid-stack-item > .grid-stack-item-content {
-  inset: 4px;
-}
-
-.grid-stack > .grid-stack-item > .ui-resizable-se {
-  right: 2px;
-  bottom: 2px;
-}
 </style>

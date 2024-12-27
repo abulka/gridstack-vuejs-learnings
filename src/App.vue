@@ -19,7 +19,7 @@ import GridStackDemo3Two from './components/GridStackDemo3Two.vue'
 </template>
 
 <style scoped>
-header {
+/* header {
   line-height: 1.5;
 }
 
@@ -44,5 +44,5 @@ header {
     place-items: flex-start;
     flex-wrap: wrap;
   }
-}
+} */
 </style>

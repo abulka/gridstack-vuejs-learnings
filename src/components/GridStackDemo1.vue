@@ -40,13 +40,12 @@ const items = [
 
 onMounted(() => {
     grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
-        float: true,
-        cellHeight: "70px",
         minRow: 2, // how big the initial canvas is
         alwaysShowResizeHandle: false,
         cellHeight: 'auto',
-        float: true,  // false means float everything to the top
+        float: false,  // false means float everything to the top
         margin: 10,
+        children: items, // if want to add items on init OPTIONAL
     });
 
     grid.on("dragstop", function (event, element) {
