@@ -3,6 +3,7 @@ import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import GridStackDemo1 from './components/GridStackDemo1.vue'
 import GridStackDemo2 from './components/GridStackDemo2.vue'
+import GridStackDemo3Two from './components/GridStackDemo3Two.vue'
 // import LayoutDemo1 from './components/LayoutDemo1.vue'
 
 </script>
@@ -10,7 +11,8 @@ import GridStackDemo2 from './components/GridStackDemo2.vue'
 <template>
   <main>
     <!-- <GridStackDemo1 /> -->
-    <GridStackDemo2 />
+    <!-- <GridStackDemo2 /> -->
+    <GridStackDemo3Two />
     <!-- <LayoutDemo1 /> -->
     <!-- <TheWelcome /> -->
   </main>
