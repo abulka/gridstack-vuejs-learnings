@@ -2,13 +2,16 @@
 import { onMounted, ref, h, render } from 'vue'
 import { GridStack, type GridStackNode, Utils } from 'gridstack'
 import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
+import type { GridStackWidget } from 'gridstack'
 import DemoBlank from './DemoBlank1.vue'
 import DemoImage from './DemoImage.vue'
 
-// Types
-interface SidebarItem extends GridStackNode {
-  content: string
-  id?: string
+/* Types/Interfaces 
+    GridStackWidget has x, y, w, h, id, content + many others
+    GridStackWidgetExt adds kind ⇦ for vue component use
+    GridStackNode adds el, grid, subGrid
+*/
+interface GridStackWidgetExt extends GridStackWidget {
   kind?: any
 }
 
@@ -28,18 +31,6 @@ const items: GridStackNode[] = [
   { x: 2, y: 5, content: '5' }
 ]
 
-// Sidebar content for drop creation
-const sidebarContent: SidebarItem[] = [
-  { content: 'dropped', id: 'dup_id' },
-  { content: 'max=3', w: 2, h: 1, maxW: 3 },
-  // andy
-  { content: 'dropped', id: 'fred_id' },
-  // you can supply content in gridstacknode attribute as well
-  { content: 'dropped', kind: DemoImage, id: 'mary_id' },
-  { content: 'dropped', kind: DemoBlank, id: 'sam_id', w: 4, h: 3 },
-  { content: 'dropped', kind: DemoImage, id: 'jo_id' }
-]
-
 // Grid options
 const gridOptions: GridStackOptions = {
   // column: 6, // ❌ CHANGING THIS away from 12 BROKE ITEM VISIBILITY
@@ -52,40 +43,92 @@ const gridOptions: GridStackOptions = {
   margin: 8
 }
 
+/* 
+Sidebar content for drop creation - the attributes (of type `GridStackWidget`)
+to assign to each element on drop. 
+
+You can also use `gridstacknode` attribute in the HTML to specify the attributes
+of the node, but the HTML can't specify the `kind` as a non string, so must be
+done via this technique.
+
+Each item in this array corresponds to its item in the sidebar, based on order.
+*/
+const sidebarContent: GridStackWidgetExt[] = [
+  { content: 'dropped', id: 'dup_id' },
+  { content: 'max=3', w: 2, h: 1, maxW: 3 },
+  // andy
+  { content: 'dropped', id: 'fred_id' },
+  // you can supply content in gridstacknode attribute as well
+  { content: 'dropped', kind: DemoImage, id: 'mary_id' },
+  { content: 'dropped', kind: DemoBlank, id: 'sam_id', w: 4, h: 3 },
+  { content: 'dropped', kind: DemoImage, id: 'jo_id' }
+]
+
+// Lifecycle
+onMounted(() => {
+  // Initialize grids
+  const grids = GridStack.initAll(gridOptions)
+  leftGrid = grids[0]
+  rightGrid = grids[1]
+
+  // Set right grid to non-floating
+  rightGrid.float(false)
+
+  // Setup drag-in functionality
+  GridStack.setupDragIn(
+    '.sidebar-item, .sidebar>.grid-stack-item',
+    { helper: myClone },
+    sidebarContent
+  )
+
+  // Add events to both grids
+  grids.forEach((grid, i) => addGridEvents(grid, i))
+})
+
 // Helper function for cloning sidebar items
 function myClone(el: HTMLElement): HTMLElement {
+
+  // If the element has a gs-id of 'manual', create a widget with a w of 2
+  // and content of 'manual'
   if (el.getAttribute('gs-id') === 'manual') {
-    console.log(`  myClone: manual`, el)
-    return Utils.createWidgetDivs(undefined, { w: 2, content: 'manual' })
+    console.log(`💋💋 myClone: manual`, el)
+    /** create the default grid item divs, and content possibly lazy loaded calling GridStack.renderCB */
+    const itemClass: string = ''
+    const n: GridStackNode = { w: 2, content: 'manual' }
+    const newEl: HTMLElement = Utils.createWidgetDivs(itemClass, n)
+    return newEl
   }
-  console.log(`  myClone: clone`, el)
+  console.log(`💋 myClone: clone`, el)
   const newEl = el.cloneNode(true) as HTMLElement // also removes the id attribute
   return newEl as HTMLElement
 }
 
-function addHandler(items: GridStackNode[]) {
-    // console.log(`addHandler, items`, items)
-    for (const item of items) {
-        console.log(`✅ addHandler for item`, item)
-        const itemEl = item.el as HTMLElement
-        const itemElContent = itemEl.querySelector('.grid-stack-item-content') as HTMLElement
-
-        const widgetId = item.id
-
-        if (typeof widgetId === 'undefined') {
-            console.error('  Widget ID is undefined')
-            continue
-        }
-        console.log(`  Widget ID ${widgetId} found`)
-
-        const kind = item.kind ? item.kind : DemoBlank
-
-        // // dynamically render a vue component, and append it to the grid stack item content
-        // // https://vuejs.org/guide/extras/render-function.html
-        const widgetNode = h(kind, { widgetId })
-        console.log(`widgetNode`, widgetNode)
-        render(widgetNode, itemElContent)
+function convertToVue(items: GridStackNode[]) {
+  for (const item of items) {
+    console.log(`✅ convertToVue for item`, item)
+    if (!item.el) {
+      console.error('  Element is undefined')
+      continue
     }
+    const itemEl: HTMLElement = item.el
+    const itemElContent = itemEl.querySelector('.grid-stack-item-content') as HTMLElement
+
+    const widgetId = item.id
+
+    if (typeof widgetId === 'undefined') {
+      console.error('  Widget ID is undefined')
+      continue
+    }
+    console.log(`  Widget ID ${widgetId} found`)
+
+    const kind = item.kind ? item.kind : DemoBlank
+
+    // // dynamically render a vue component, and append it to the grid stack item content
+    // // https://vuejs.org/guide/extras/render-function.html
+    const widgetNode = h(kind, { widgetId })
+    console.log(`widgetNode`, widgetNode)
+    render(widgetNode, itemElContent)
+  }
 }
 
 // Comprehensive event handler
@@ -93,9 +136,9 @@ function addGridEvents(grid: GridStack, id: number) {
   const g = id !== undefined ? `grid${id} ` : ''
 
   grid.on('added', (event: Event, items: GridStackNode[]) => {
-    dumpItems(0)
-    addHandler(items)
-    dumpItems(0)
+    // dumpItems(0)
+    convertToVue(items)
+    // dumpItems(0)
   })
 
   grid.on('added removed change', (event: Event, items: GridStackNode[]) => {
@@ -186,29 +229,9 @@ function compact(index: number) {
 function dumpItems(index: number) {
   const grid = index === 0 ? leftGrid : rightGrid
   const loadedNodes = grid?.engine.nodes || []; // Get loaded nodes
-  console.log('  🌻 dumpItems', loadedNodes);  
+  console.log('  🌻 dumpItems', loadedNodes);
 }
 
-// Lifecycle
-onMounted(() => {
-  // Initialize grids
-  const grids = GridStack.initAll(gridOptions)
-  leftGrid = grids[0]
-  rightGrid = grids[1]
-
-  // Set right grid to non-floating
-  rightGrid.float(false)
-
-  // Setup drag-in functionality
-  GridStack.setupDragIn(
-    '.sidebar-item, .sidebar>.grid-stack-item',
-    { helper: myClone },
-    sidebarContent
-  )
-
-  // Add events to both grids
-  grids.forEach((grid, i) => addGridEvents(grid, i))
-})
 </script>
 
 <template>
@@ -223,37 +246,64 @@ onMounted(() => {
     <div class="main-content">
       <div class="left-section">
         <div class="sidebar">
-          <div class="sidebar-item">Drag me</div>
-          <div class="sidebar-item">2x1, max=3</div>
-<!-- andy -->
-          <div class="sidebar-item">Drag me2</div>
-          <div class="sidebar-item" gs-id="mary">Drag me3</div>
-          <div class="sidebar-item"
-            gridstacknode='{ "id": "meee", "h": 3, "w": 4, "content": "me4" }'>Drag me4</div>
 
-<!-- andy ends -->
+          <div class="sidebar-item">Drag me</div>
+
+          <div class="sidebar-item">2x1, max=3</div>
+
+          <!-- andy palette -->
+          <div class="sidebar-item">Drag me2</div>
+
           <div class="sidebar-item"
-            gridstacknode='{ "w": 3, "content": "w:3" }'>w:3</div>
+            gs-id="mary">Drag me3
+          </div>
+
           <div class="sidebar-item"
-            gs-id="manual">gs-id case</div>
-          <div class="grid-stack-item"
-            gs-w="3">
+            gridstacknode='{ "id": "meee", "h": 3, "w": 4, "content": "me4" }'>
+            Drag me4
+          </div>
+          <!-- andy ends -->
+
+          <div class="sidebar-item"
+            gridstacknode='{ "w": 3, "content": "w:3" }'>
+            w:3
+          </div>
+
+          <div class="sidebar-item"
+            gs-id="manual">
+            gs-id = manual
+          </div>
+
+          <div class="grid-stack-item" gs-w="3">
             <div class="grid-stack-item-content">DOM gs-w:3</div>
           </div>
+
           <div class="grid-stack-item"
             gridstacknode='{ "w": 2 }'>
-            <div class="grid-stack-item-content">DOM w:2</div>
+            <div class="grid-stack-item-content">
+              DOM w:2
+            </div>
           </div>
+
           <div class="grid-stack-item"
-            gs-w="3" gs-h="3">
-            <div class="grid-stack-item-content">🎄DOM</div>
+            gs-w="3"
+            gs-h="3">
+            <div class="grid-stack-item-content">
+              🎄DOM
+            </div>
           </div>
+
           <div class="grid-stack-item"
-          gridstacknode='{ "w": 4, "h": 1 }'>
-            <div class="grid-stack-item-content">👉 DOM</div>
+            gridstacknode='{ "w": 4, "h": 1 }'>
+            <div class="grid-stack-item-content">
+              👉 DOM
+            </div>
           </div>
+
           <div class="sidebar-item"
-          gridstacknode='{ "w": 4, "h": 1 }'>👉 Drag me</div>
+            gridstacknode='{ "w": 4, "h": 1 }'>
+            👉 Drag me
+          </div>
 
         </div>
       </div>
@@ -355,5 +405,4 @@ alternatively import the styles in the script section. */
 .float-active {
   background: #45a049;
 }
-
 </style>
