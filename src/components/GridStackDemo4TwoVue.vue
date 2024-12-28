@@ -21,6 +21,14 @@ let rightGrid: GridStack | null = null;
 const leftGridFloat = ref(true)
 const rightGridFloat = ref(false)
 
+// Set to true to use the renderCB technique Set to false to use the myClone &
+// convertToVue technique Both techniques are shown for comparison
+//
+// Remember to disable the myClone helper function { helper: myClone }, if you
+// want to use the renderCB technique, and enable it if you want to use the
+// myClone + convertToVue technique
+const useRenderCB: boolean = false
+
 // Initial grid items
 const items: GridStackNode[] = [
   { x: 0, y: 0, w: 2, h: 2, content: '0' },
@@ -61,7 +69,11 @@ const sidebarContent: GridStackWidgetExt[] = [
   // you can supply content in gridstacknode attribute as well
   { content: 'dropped', kind: DemoImage, id: 'mary_id' },
   { content: 'dropped', kind: DemoBlank, id: 'sam_id', w: 4, h: 3 },
-  { content: 'dropped', kind: DemoImage, id: 'jo_id' }
+  { content: 'dropped', kind: DemoImage, id: 'jo_id' },
+  {},
+  {},
+  {},
+  {}
 ]
 
 // Lifecycle
@@ -77,8 +89,8 @@ onMounted(() => {
   // Setup drag-in functionality
   GridStack.setupDragIn(
     '.sidebar-item, .sidebar>.grid-stack-item',
-    // { helper: myClone },
-    {  },
+    { helper: myClone }, // when using myClone + convertToVue, causes renderCB not to be called
+    // {}, // when using renderCB, don't need myClone
     sidebarContent
   )
 
@@ -94,19 +106,22 @@ onMounted(() => {
 
   🤯 You don't need `convertToVue` if you use this callback
 
-  📝 But... this callback is only called if you have an entry in the
-  sidebarContent array
+  📝 But... this callback is only called if 
+    - you have an entry in the sidebarContent array
+    - you have disabled the `myClone` helper function { helper: myClone },
   */
-  GridStack.renderCB = function(el, w) {
-      // el.innerHTML = w.content; // default behaviour
-      
+  GridStack.renderCB = function (el, w) {
+    if (useRenderCB) {
       // Dynamically render a vue component
       const widgetId = w.id ? w.id : 'no_id'
       const widgetNode = h(DemoImage, { widgetId })
       render(widgetNode, el)
+    }
+    else
+      el.innerHTML = w.content; // default behaviour
 
-      console.log(`🌻 renderCB: el`, el, `w`, w)
-    };
+    console.log(`🌻 renderCB: el`, el, `w`, w)
+  };
 })
 
 /*
@@ -118,6 +133,11 @@ with a w of 2 and content of 'manually created'. Otherwise, clone the element.
 */
 function myClone(el: HTMLElement): HTMLElement {
   let newEl: HTMLElement;
+
+  if (useRenderCB) {
+    console.log(`💋💋💋 helper myClone: renderCB of sidebar div - ignoring and letting renderCB do it all`, el);
+    return el
+  }
 
   if (el.getAttribute('gs-id') === 'manual') {
     console.log(`💋💋 helper myClone: manual of sidebar div`, el);
@@ -167,7 +187,8 @@ function addGridEvents(grid: GridStack, id: number) {
 
   grid.on('added', (event: Event, items: GridStackNode[]) => {
     // dumpItems(0)
-    // convertToVue(items)
+    if (useRenderCB) return
+    convertToVue(items)
     // dumpItems(0)
   })
 
@@ -304,7 +325,8 @@ function dumpItems(index: number) {
             gs-id = manual
           </div>
 
-          <div class="grid-stack-item" gs-w="3">
+          <div class="grid-stack-item"
+            gs-w="3">
             <div class="grid-stack-item-content">
               DOM gs-w:3
             </div>
