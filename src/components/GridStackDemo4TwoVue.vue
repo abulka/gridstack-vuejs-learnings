@@ -55,7 +55,7 @@ Each item in this array corresponds to its item in the sidebar, based on order.
 */
 const sidebarContent: GridStackWidgetExt[] = [
   { content: 'dropped', id: 'dup_id' },
-  { content: 'max=3', w: 2, h: 1, maxW: 3 },
+  { content: 'max=3 ha ha', w: 2, h: 1, maxW: 3 },
   // andy
   { content: 'dropped', id: 'fred_id' },
   // you can supply content in gridstacknode attribute as well
@@ -77,30 +77,60 @@ onMounted(() => {
   // Setup drag-in functionality
   GridStack.setupDragIn(
     '.sidebar-item, .sidebar>.grid-stack-item',
-    { helper: myClone },
+    // { helper: myClone },
+    {  },
     sidebarContent
   )
 
   // Add events to both grids
   grids.forEach((grid, i) => addGridEvents(grid, i))
+
+  /*
+  Callback to create the content of widgets so the app can control how to store
+  and restore it By default this lib will do 'el.textContent = w.content'
+  forcing text only support for avoiding potential XSS issues.
+
+  🤯 You don't need `myClone` if you use this callback
+
+  🤯 You don't need `convertToVue` if you use this callback
+
+  📝 But... this callback is only called if you have an entry in the
+  sidebarContent array
+  */
+  GridStack.renderCB = function(el, w) {
+      // el.innerHTML = w.content; // default behaviour
+      
+      // Dynamically render a vue component
+      const widgetId = w.id ? w.id : 'no_id'
+      const widgetNode = h(DemoImage, { widgetId })
+      render(widgetNode, el)
+
+      console.log(`🌻 renderCB: el`, el, `w`, w)
+    };
 })
 
-// Helper function for cloning sidebar items
-function myClone(el: HTMLElement): HTMLElement {
+/*
+Helper function for cloning sidebar items. Is passed the full HTML element
+dragged `el`.
 
-  // If the element has a gs-id of 'manual', create a widget with a w of 2
-  // and content of 'manual'
+Special case for fun: If the element has a gs-id of 'manual', create a widget
+with a w of 2 and content of 'manually created'. Otherwise, clone the element.
+*/
+function myClone(el: HTMLElement): HTMLElement {
+  let newEl: HTMLElement;
+
   if (el.getAttribute('gs-id') === 'manual') {
-    console.log(`💋💋 myClone: manual`, el)
+    console.log(`💋💋 helper myClone: manual of sidebar div`, el);
     /** create the default grid item divs, and content possibly lazy loaded calling GridStack.renderCB */
-    const itemClass: string = ''
-    const n: GridStackNode = { w: 2, content: 'manual' }
-    const newEl: HTMLElement = Utils.createWidgetDivs(itemClass, n)
-    return newEl
+    const class_: string = '';
+    const n: GridStackNode = { w: 2, content: 'manually created' };
+    newEl = Utils.createWidgetDivs(class_, n);
+  } else {
+    console.log(`💋 helper myClone: pure clone of sidebar div`, el);
+    newEl = el.cloneNode(true) as HTMLElement; // also removes the id attribute
   }
-  console.log(`💋 myClone: clone`, el)
-  const newEl = el.cloneNode(true) as HTMLElement // also removes the id attribute
-  return newEl as HTMLElement
+
+  return newEl;
 }
 
 function convertToVue(items: GridStackNode[]) {
@@ -137,7 +167,7 @@ function addGridEvents(grid: GridStack, id: number) {
 
   grid.on('added', (event: Event, items: GridStackNode[]) => {
     // dumpItems(0)
-    convertToVue(items)
+    // convertToVue(items)
     // dumpItems(0)
   })
 
@@ -229,7 +259,7 @@ function compact(index: number) {
 function dumpItems(index: number) {
   const grid = index === 0 ? leftGrid : rightGrid
   const loadedNodes = grid?.engine.nodes || []; // Get loaded nodes
-  console.log('  🌻 dumpItems', loadedNodes);
+  console.log('----- dumpItems', loadedNodes);
 }
 
 </script>
@@ -275,7 +305,9 @@ function dumpItems(index: number) {
           </div>
 
           <div class="grid-stack-item" gs-w="3">
-            <div class="grid-stack-item-content">DOM gs-w:3</div>
+            <div class="grid-stack-item-content">
+              DOM gs-w:3
+            </div>
           </div>
 
           <div class="grid-stack-item"
@@ -304,6 +336,8 @@ function dumpItems(index: number) {
             gridstacknode='{ "w": 4, "h": 1 }'>
             👉 Drag me
           </div>
+
+          <div class="sidebar-item">Drag me!!</div>
 
         </div>
       </div>
