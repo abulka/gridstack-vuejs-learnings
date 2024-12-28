@@ -102,6 +102,17 @@ onMounted(() => {
   and restore it By default this lib will do 'el.textContent = w.content'
   forcing text only support for avoiding potential XSS issues.
 
+  el: I think this is the parent div that GridStack has created, 
+    into which to put the content
+    e.g. <div class="grid-stack-item-content"></div>
+
+  w: GridStackWidget - taken from a combination of HTML attributes
+    and `sidebarContent` array info (if present)
+    e.g. { content: 'dropped', id: 'dup_id' } incl. additional 
+    fields { x, y, w, h, _id }
+    (entire GridStackWidget is passed so you can use id or some other field as
+    logic)
+
   🤯 You don't need `myClone` if you use this callback
 
   🤯 You don't need `convertToVue` if you use this callback
@@ -110,7 +121,7 @@ onMounted(() => {
     - you have an entry in the sidebarContent array
     - you have disabled the `myClone` helper function { helper: myClone },
   */
-  GridStack.renderCB = function (el, w) {
+  GridStack.renderCB = function (el: HTMLElement, w: GridStackWidgetExt) {
     if (useRenderCB) {
       // Dynamically render a vue component
       const widgetId = w.id ? w.id : 'no_id'
@@ -119,7 +130,7 @@ onMounted(() => {
       render(widgetNode, el)
     }
     else
-      el.innerHTML = w.content; // default behaviour
+      el.innerHTML = w.content ? w.content : ''; // default behaviour
 
     console.log(`🌻 renderCB: el`, el, `w`, w)
   };
