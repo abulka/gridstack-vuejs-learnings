@@ -27,7 +27,7 @@ const rightGridFloat = ref(false)
 // Remember to disable the myClone helper function { helper: myClone }, if you
 // want to use the renderCB technique, and enable it if you want to use the
 // myClone + convertToVue technique
-const useRenderCB: boolean = false
+const useRenderCB: boolean = true
 
 // Initial grid items
 const items: GridStackNode[] = [
@@ -89,8 +89,8 @@ onMounted(() => {
   // Setup drag-in functionality
   GridStack.setupDragIn(
     '.sidebar-item, .sidebar>.grid-stack-item',
-    { helper: myClone }, // when using myClone + convertToVue, causes renderCB not to be called
-    // {}, // when using renderCB, don't need myClone
+    // { helper: myClone }, // when using myClone + convertToVue, causes renderCB not to be called
+    {}, // when using renderCB, don't need myClone
     sidebarContent
   )
 
@@ -114,7 +114,8 @@ onMounted(() => {
     if (useRenderCB) {
       // Dynamically render a vue component
       const widgetId = w.id ? w.id : 'no_id'
-      const widgetNode = h(DemoImage, { widgetId })
+      const kind = w.kind ? w.kind : DemoBlank
+      const widgetNode = h(kind, { widgetId })
       render(widgetNode, el)
     }
     else
