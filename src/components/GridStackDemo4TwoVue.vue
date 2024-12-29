@@ -27,7 +27,7 @@ const rightGridFloat = ref(false)
 // Remember to disable the myClone helper function { helper: myClone }, if you
 // want to use the renderCB technique, and enable it if you want to use the
 // myClone + convertToVue technique
-const useRenderCB: boolean = true
+const useRenderCB: boolean = false
 
 // Initial grid items
 const items: GridStackNode[] = [
@@ -89,8 +89,8 @@ onMounted(() => {
   // Setup drag-in functionality
   GridStack.setupDragIn(
     '.sidebar-item, .sidebar>.grid-stack-item',
-    // { helper: myClone }, // when using myClone + convertToVue, causes renderCB not to be called
-    {}, // when using renderCB, don't need myClone
+    { helper: myClone }, // when using myClone + convertToVue, causes renderCB not to be called
+    // {}, // when using renderCB, don't need myClone
     sidebarContent
   )
 
@@ -140,6 +140,10 @@ onMounted(() => {
 Helper function for cloning sidebar items. Is passed the full HTML element
 dragged `el`.
 
+el: HTMLElement - the element being dragged from the sidebar
+  Pure HTML, doesn't have the extra sidebarContent GridStackWidget
+  blended into it.
+
 Special case for fun: If the element has a gs-id of 'manual', create a widget
 with a w of 2 and content of 'manually created'. Otherwise, clone the element.
 */
@@ -150,6 +154,23 @@ function myClone(el: HTMLElement): HTMLElement {
     console.log(`💋💋💋 helper myClone: renderCB of sidebar div - ignoring and letting renderCB do it all`, el);
     return el
   }
+
+  // Experiment: 
+  // ----------
+  // Try to do the vue crestion directly here - YOU CANNOT!
+  // because 1) you need to return pure html, and 2) you don't have
+  // the extra sidebarContent GridStackWidget info here either thus can't
+  // get access to the vue component 'type' to render
+  // 
+  // The el: is the sidebar item div - can we get
+  // the GridStackWidget info from it? No, it's just the div
+  // that's being dragged not even the sidebarContent array
+  // item that corresponds to it is accessible here
+  // 
+  // const kind = el.kind ? el.kind : DemoBlank
+  // const widgetId = el.getAttribute('gs-id') || 'no_id'
+  // const widgetNode = h(kind, { widgetId })
+  // return widgetNode // NO - wrong return type, need pure html not a vue component
 
   if (el.getAttribute('gs-id') === 'manual') {
     console.log(`💋💋 helper myClone: manual of sidebar div`, el);
