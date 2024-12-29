@@ -157,7 +157,7 @@ function myClone(el: HTMLElement): HTMLElement {
 
   // Experiment: 
   // ----------
-  // Try to do the vue crestion directly here - YOU CANNOT!
+  // Try to do the vue creation directly here - YOU CANNOT!
   // because 1) you need to return pure html, and 2) you don't have
   // the extra sidebarContent GridStackWidget info here either thus can't
   // get access to the vue component 'type' to render
@@ -206,10 +206,12 @@ function convertToVue(items: GridStackNode[]) {
 
     const kind = item.kind ? item.kind : DemoBlank
 
-    // // dynamically render a vue component, and append it to the grid stack item content
-    // // https://vuejs.org/guide/extras/render-function.html
+    // if rendering regular html
+    // itemElContent.innerHTML = '<p>hello <b>there</b></p>'
+
+    // if dynamically render a vue component, and append it to the grid stack item content
+    // https://vuejs.org/guide/extras/render-function.html
     const widgetNode = h(kind, { widgetId })
-    console.log(`widgetNode`, widgetNode)
     render(widgetNode, itemElContent)
   }
 }
