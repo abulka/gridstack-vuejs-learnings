@@ -90,7 +90,7 @@ onMounted(() => {
     const itemId = widget.id;
     const kind = widget.kind ? widget.kind : GridItemComponent
     const widgetNode = h(kind, {
-      itemId: itemId, // TODO all components should have itemId prop and emit remove event
+      itemId: itemId, // All widget components should have itemId prop and emit remove event (if they have a X remove button)
       onRemove: () => {
         // Catch the remove event from the Vue component
         grid.removeWidget(gridItemEl); // div.grid-stack-item
