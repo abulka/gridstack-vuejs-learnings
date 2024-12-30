@@ -31,7 +31,7 @@ let info = ref("");
 let timerId = null;
 let grid = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
 const items = [
-    { x: 2, y: 1, h: 2 },
+    { x: 2, y: 1, h: 2, content: 'hi' },
     { x: 2, y: 4, w: 3 },
     { x: 4, y: 2 },
     { x: 3, y: 1, h: 2 },
@@ -52,6 +52,7 @@ onMounted(() => {
         const node = element.gridstackNode;
         info.value = `you just dragged node #${node.id} to ${node.x},${node.y} – good job!`;
     });
+    count.value = items.length + 1; // start id counter at the length of the items array
 });
 
 function addNewWidget() {

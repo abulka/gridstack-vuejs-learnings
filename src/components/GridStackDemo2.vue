@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { h, onMounted, render, watchEffect, ref } from 'vue'
 import { GridStack } from 'gridstack';
-import DemoBlank from './DemoBlank1.vue'
 import { type GridStackNode } from 'gridstack';
-import DemoImage from './DemoImage.vue';
+import DemoBlank from './widgets/DemoBlank1.vue'
+import DemoImage from './widgets/DemoImage1.vue';
 
 let grid: GridStack | null = null;
 
@@ -80,7 +80,7 @@ function addHandler(items: GridStackNode[]) {
 
         // dynamically render a vue component, and append it to the grid stack item content
         // https://vuejs.org/guide/extras/render-function.html
-        const widgetNode = h(kind, { itemId: widgetId })
+        const widgetNode = h(kind, { widgetId })
         render(widgetNode, itemElContent)
     }
 }
@@ -106,7 +106,7 @@ function addNewWidget() {
 
     <!-- <div class="grid-stack grow shrink-0 w-full h-full" id="demo2-grid"></div> -->
     <div class="grid-stack"></div>
-    <DemoImage imageUrl="/flowers.png" />
+    <DemoImage imageUrl="/flowers.png" widgetId="flowers-big"/>
 </template>
 
 <style>

@@ -25,7 +25,7 @@
   
   <script setup>
   import { ref, onMounted, onBeforeUnmount, h, render } from 'vue';
-  import GridItemComponent from './DemoGridItemComponent.vue';
+  import GridItemComponent from './widgets/DemoGridItemComponent.vue';
   
   import { GridStack } from 'gridstack';
   //import { GridStack, type GridStackNode, Utils } from 'gridstack';

@@ -3,8 +3,8 @@ import { onMounted, ref, h, render } from 'vue'
 import { GridStack, type GridStackNode, Utils } from 'gridstack'
 import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
 import type { GridStackWidget } from 'gridstack'
-import DemoBlank from './DemoBlank1.vue'
-import DemoImage from './DemoImage.vue'
+import DemoBlank from './widgets/DemoBlank1.vue'
+import DemoImage from './widgets/DemoImage1.vue'
 
 /* Types/Interfaces 
     GridStackWidget has x, y, w, h, id, content + many others
@@ -126,7 +126,7 @@ onMounted(() => {
       // Dynamically render a vue component
       const widgetId = w.id ? w.id : 'no_id'
       const kind = w.kind ? w.kind : DemoBlank
-      const widgetNode = h(kind, { itemId: widgetId })
+      const widgetNode = h(kind, { widgetId })
       render(widgetNode, el)
     }
     else

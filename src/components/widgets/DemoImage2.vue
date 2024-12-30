@@ -6,7 +6,6 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
 import { onBeforeUnmount, toRefs } from 'vue';
 
 const props = defineProps({
@@ -22,7 +21,7 @@ const props = defineProps({
 const { itemId } = toRefs(props);
 
 onBeforeUnmount(() => {
-    console.log(`In DemoImage onBeforeUnmount for item ${itemId.value}`);
+    console.log(`In DemoImage2 onBeforeUnmount for item ${itemId.value}`);
 });
 </script>
 

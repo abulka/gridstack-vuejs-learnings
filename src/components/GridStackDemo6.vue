@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, h, render } from 'vue';
-import GridItemComponent from './DemoGridItemComponent.vue';
-import DemoBlank from './DemoBlank1.vue'
-import DemoImage from './DemoImage.vue'
+import GridItemComponent from './widgets/DemoGridItemComponent.vue';
+import DemoBlank from './widgets/DemoBlank2.vue'
+import DemoImage from './widgets/DemoImage2.vue'
 import { GridStack } from 'gridstack';
 import { type GridStackNode, Utils } from 'gridstack';
 import type { GridStackOptions, GridItemHTMLElement } from 'gridstack'
@@ -56,7 +56,7 @@ You must define some content or the renderCB will not be called.
 const sidebarContent: GridStackWidgetExt[] = [
   { content: 'n/a', id: '111', kind: GridItemComponent, w: 2, h: 1 },
   { content: 'n/a', id: '222', kind: DemoImage, w: 2, h: 1, maxW: 4, maxH: 2 },
-  { content: 'n/a', id: '333', kind: DemoBlank, w: 4, h: 3 },
+  { content: 'n/a', id: '333', kind: DemoBlank, w: 3, h: 2 },
   {}
 ]
 
