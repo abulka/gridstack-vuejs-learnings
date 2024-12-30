@@ -20,10 +20,10 @@ interface GridStackWidgetExt extends GridStackWidget {
 const info = ref('');
 let grid: GridStack | null = null;
 const items = [
-  { id: 1, x: 2, y: 1, h: 2 },
-  { id: 2, x: 2, y: 4, w: 3 },
-  { id: 3, x: 4, y: 2 },
-  { id: 4, x: 3, y: 1, h: 2 },
+  { id: 1, x: 0, y: 1, h: 2, w: 2 },
+  { id: 2, x: 2, y: 4, h: 2, w: 6 },
+  { id: 3, x: 4, y: 2, h: 2, w: 2 },
+  { id: 4, x: 2, y: 1, h: 2, w: 2 },
   { id: 5, x: 0, y: 6, w: 2, h: 2 },
 ];
 let count = ref(items.length);
@@ -55,7 +55,7 @@ You must define some content or the renderCB will not be called.
 */
 const sidebarContent: GridStackWidgetExt[] = [
   { content: 'n/a', id: '111', kind: GridItemComponent, w: 2, h: 1 },
-  { content: 'n/a', id: '222', kind: DemoImage, w: 2, h: 1, maxW: 4, maxH: 3 },
+  { content: 'n/a', id: '222', kind: DemoImage, w: 2, h: 1, maxW: 4, maxH: 2 },
   { content: 'n/a', id: '333', kind: DemoBlank, w: 4, h: 3 },
   {}
 ]
