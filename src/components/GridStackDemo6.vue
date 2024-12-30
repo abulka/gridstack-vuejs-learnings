@@ -50,12 +50,13 @@ of the node, but the HTML can't specify the `kind` as a non string, so must be
 done via this technique.
 
 Each item in this array corresponds to its item in the sidebar, based on order.
+
+You must define some content or the renderCB will not be called.
 */
 const sidebarContent: GridStackWidgetExt[] = [
-  { content: '', id: '1', kind: GridItemComponent, w: 2, h: 1 },
-  { content: '', id: '2', kind: DemoImage, w: 2, h: 1, maxW: 4, maxH: 4 },
-  { content: '', id: '3', kind: DemoBlank, w: 4, h: 3 },
-  {},
+  { content: 'n/a', id: '111', kind: GridItemComponent, w: 2, h: 1 },
+  { content: 'n/a', id: '222', kind: DemoImage, w: 2, h: 1, maxW: 4, maxH: 3 },
+  { content: 'n/a', id: '333', kind: DemoBlank, w: 4, h: 3 },
   {}
 ]
 
@@ -79,16 +80,19 @@ onMounted(() => {
     });
   });
 
-  GridStack.renderCB = function (el, widget) {
+  GridStack.renderCB = function (el: HTMLElement, widget: GridStackWidgetExt) {
     // el: HTMLElement div.grid-stack-item-content
     // widget: GridStackWidget
 
+    console.log(`${widget.id} renderCB`);
+    
     const gridItemEl = el.closest('.grid-stack-item'); // div.grid-stack-item (parent of el)
 
     // Create Vue component for the widget content
     const itemId = widget.id;
-    const widgetNode = h(GridItemComponent, {
-      itemId: itemId,
+    const kind = widget.kind ? widget.kind : GridItemComponent
+    const widgetNode = h(kind, {
+      itemId: itemId, // TODO all components should have itemId prop and emit remove event
       onRemove: () => {
         // Catch the remove event from the Vue component
         grid.removeWidget(gridItemEl); // div.grid-stack-item
