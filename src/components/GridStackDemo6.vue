@@ -146,12 +146,14 @@ function toggleFloat() {
       using the modern (since V11) GridStack.renderCB. Add <strong>kind</strong>
       prop to the widget data to render different components.
     </p>
-    <button type="button"
-      @click="addNewWidget">Add Widget</button> {{ info }}
+    <button class="control-btn"
+      @click="addNewWidget">Add Item Widget</button>
     <button class="control-btn"
       @click="compact(0)">Compact</button>
     <button class="control-btn"
       @click="toggleFloat">Toggle Float</button>
+    
+    {{ info }}
 
     <div class="main-content">
       <div class="left-section">
@@ -159,7 +161,7 @@ function toggleFloat() {
 
           <div class="sidebar-item">Item</div>
           <div class="sidebar-item">Image</div>
-          <div class="sidebar-item">Blank</div>
+          <div class="sidebar-item">Ticker</div>
 
         </div>
       </div>
@@ -183,6 +185,12 @@ alternatively import the styles in the script section. */
   height: auto;
 }
 
+.sidebar-item {
+  /* override the demo.css style - add a bit of margin */
+  margin: 2px;
+  cursor: pointer;
+}
+
 .grid-demo {
   padding: 20px;
   max-width: 1200px;
@@ -201,19 +209,6 @@ alternatively import the styles in the script section. */
 
 .right-section {
   flex: 1;
-}
-
-.grids-container {
-  display: flex;
-  gap: 20px;
-}
-
-.grid-section {
-  flex: 1;
-}
-
-.grid-controls {
-  margin-bottom: 10px;
 }
 
 .control-btn {
