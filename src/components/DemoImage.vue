@@ -1,14 +1,16 @@
 <template>
     <div>
-        <img :src="imageUrl" alt="Demo Image" />
+        <img :src="imageUrl"
+            alt="Demo Image" />
     </div>
 </template>
 
 <script setup>
 import { defineProps } from 'vue';
+import { onBeforeUnmount, toRefs } from 'vue';
 
 const props = defineProps({
-    widgetId: {
+    itemId: {
         type: String,
         required: true
     },
@@ -17,7 +19,11 @@ const props = defineProps({
         default: '/pic01.png'
     }
 });
+const { itemId } = toRefs(props);
 
+onBeforeUnmount(() => {
+    console.log(`In DemoImage onBeforeUnmount for item ${itemId.value}`);
+});
 </script>
 
 <style scoped>

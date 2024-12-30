@@ -80,7 +80,7 @@ function addHandler(items: GridStackNode[]) {
 
         // dynamically render a vue component, and append it to the grid stack item content
         // https://vuejs.org/guide/extras/render-function.html
-        const widgetNode = h(kind, { widgetId })
+        const widgetNode = h(kind, { itemId: widgetId })
         render(widgetNode, itemElContent)
     }
 }

@@ -126,7 +126,7 @@ onMounted(() => {
       // Dynamically render a vue component
       const widgetId = w.id ? w.id : 'no_id'
       const kind = w.kind ? w.kind : DemoBlank
-      const widgetNode = h(kind, { widgetId })
+      const widgetNode = h(kind, { itemId: widgetId })
       render(widgetNode, el)
     }
     else

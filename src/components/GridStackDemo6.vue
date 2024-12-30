@@ -84,8 +84,6 @@ onMounted(() => {
     // el: HTMLElement div.grid-stack-item-content
     // widget: GridStackWidget
 
-    console.log(`${widget.id} renderCB`);
-    
     const gridItemEl = el.closest('.grid-stack-item'); // div.grid-stack-item (parent of el)
 
     // Create Vue component for the widget content
