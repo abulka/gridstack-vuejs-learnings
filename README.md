@@ -35,6 +35,10 @@ Only enable one component at a time in `src/App.js` to see the demo in action.  
 
 # Screenshots
 
+## GridStackDemo6
+
+![screenshot-GridStackDemo6](/doco/screenshot-GridStackDemo6.png)
+
 ## GridStackDemo5MyPullRequest
 
 ![GridStackDemo5MyPullRequest](/doco/screenshot-GridStackDemo5MyPullRequest.png)
