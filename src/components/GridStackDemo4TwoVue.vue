@@ -47,7 +47,7 @@ const gridOptions: GridStackOptions = {
   float: true,
   removable: '.trash',
   acceptWidgets: () => true,
-  // children: items, // OPTIONAL - pre-populate with items
+  // children: items, // OPTIONAL - pre-populate with items or call grid.load(items); later
   margin: 8
 }
 
