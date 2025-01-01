@@ -7,6 +7,7 @@ import GridStackDemo3Two from './components/GridStackDemo3Two.vue'
 import GridStackDemo4TwoVue from './components/GridStackDemo4TwoVue.vue'
 import GridStackDemo5MyPullRequest from './components/GridStackDemo5MyPullRequest.vue'
 import GridStackDemo6 from './components/GridStackDemo6.vue'
+import ProblemDemo1 from './components/ProblemDemo1.vue'
 
 </script>
 
@@ -17,7 +18,9 @@ import GridStackDemo6 from './components/GridStackDemo6.vue'
     <!-- <GridStackDemo3Two /> -->
     <!-- <GridStackDemo4TwoVue /> -->
     <!-- <GridStackDemo5MyPullRequest /> -->
-    <GridStackDemo6 />
+    <!-- <GridStackDemo6 /> -->
+    <ProblemDemo1 />
+
     <!-- <TheWelcome /> -->
   </main>
 </template>
