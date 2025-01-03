@@ -1,0 +1,49 @@
+@startuml
+title GridStack UML Diagram v 0.1
+
+class GridStackWidget {
+    x
+    y
+    w
+    h
+    id
+    content 
+    // ... many others
+}
+
+class GridStackNode extends GridStackWidget {
+    el?: GridItemHTMLElement
+    grid
+    subGrid
+}
+
+class GridStackWidgetExt extends GridStackWidget {
+    kind: Component 
+    kindEditor: Component
+}
+
+interface GridStackElement {}
+
+class HTMLElement {}
+
+class GridItemHTMLElement extends HTMLElement {
+    gridstackNode?: GridStackNode
+}
+
+class Grid {
+    nodes: GridStackNode[]
+}
+
+Grid *-- "*" GridStackNode
+
+GridStackNode --> "el" GridItemHTMLElement
+GridItemHTMLElement ..> "gridstackNode" GridStackNode
+GridStackNode ..> "grid" Grid
+'GridStackWidgetExt --> GridStackWidget 
+'GridStackNode --|> GridStackWidgetExt
+
+note right of GridStackElement
+    string | HTMLElement | GridItemHTMLElement
+end note
+
+@enduml
