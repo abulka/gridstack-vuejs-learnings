@@ -1,5 +1,5 @@
 @startuml
-title GridStack UML Diagram v 0.1
+title GridStack UML Diagram v1.2
 
 class GridStackWidget {
     x
@@ -11,7 +11,7 @@ class GridStackWidget {
     // ... many others
 }
 
-class GridStackNode extends GridStackWidget {
+class GridStackNode extends GridStackWidget, GridStackWidgetExt {
     el?: GridItemHTMLElement
     grid
     subGrid
@@ -42,7 +42,7 @@ GridStackNode ..> "grid" Grid
 'GridStackWidgetExt --> GridStackWidget 
 'GridStackNode --|> GridStackWidgetExt
 
-note right of GridStackElement
+note bottom of GridStackElement
     string | HTMLElement | GridItemHTMLElement
 end note
 
