@@ -35,6 +35,16 @@ Only enable one component at a time in `src/App.js` to see the demo in action.  
 
 # Screenshots
 
+# ProblemDemo3GridStackDemo8
+
+![screenshot-ProblemDemo3GridStackDemo8](/doco/screenshot-ProblemDemo3GridStackDemo8.png)
+
+The Problem: ❌ The User interaction of moving a widget, or calling update() to programmatically 
+move a widget, doesn't trigger the computed selectedGridStackNode to re-run because the gridstack
+object is not reactive. Thus we don't see the x, y, id of the selectedGridStackNode update in the UI.
+
+Solutions found.
+    
 ## GridStackDemo6
 
 ![screenshot-GridStackDemo6](/doco/screenshot-GridStackDemo6.png)

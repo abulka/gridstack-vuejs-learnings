@@ -1,5 +1,8 @@
 <template>
-    <h1>Chained computed Reactivity and selection - GridStack.js with Vue.js</h1>
+    <h3>ProblemDemo3GridStackDemo8.vue</h3>
+    <p>Chained computed Reactivity and selection - GridStack.js with Vue.js.</p>
+    <p>Works ok now - remember tips in Mac Notes "Reactivity computed debacle" and comments in this code <strong>ProblemDemo3GridStackDemo8.vue</strong></p>
+    <hr>
     <p>selectedId: {{ selectedId }} selectedGridStackNode.id: {{ selectedGridStackNode?.id }}</p>
     <p v-if="selectedGridStackNode">selectedGridStackNode.x: {{ selectedGridStackNode?.x }} y: {{
         selectedGridStackNode?.y }}</p>
