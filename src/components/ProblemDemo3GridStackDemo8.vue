@@ -1,5 +1,5 @@
 <template>
-    <h1>Reactivity and selection GridStack.js with Vue.js</h1>
+    <h1>Chained computed Reactivity and selection - GridStack.js with Vue.js</h1>
     <p>selected: {{ selectedGridStackNode?.id }}</p>
     <p v-if="selectedGridStackNode">selectedGridStackNode x: {{ selectedGridStackNode?.x }} y: {{ selectedGridStackNode?.y }}</p>
     <p v-else>no node selected</p>
@@ -29,10 +29,19 @@ const items = [
 const selectedId = ref('');
 
 const selectedGridStackNode = computed < GridStackNode | null > (() => {
-    const currentSelectedId = selectedId.value;  // explicit dependency NEEDED!!
     console.log(`  selectedGridStackNode being computed`);
+
+    // THIS FAILS TO BE REACTIVE
+    // return grid?.engine.nodes.find(node => node.id === selectedId.value) || null; // 'find' breaks reactivity
+
+    // THIS FAILS TO BE REACTIVE
+    // const result = grid?.engine.nodes.find(node => node.id === selectedId.value);
+    // return result;
+
+    // THIS WORKS
+    const currentSelectedId = selectedId.value;  // explicit dependency NEEDED!!
     return grid?.engine.nodes.find(node => node.id === currentSelectedId) || null;
-});
+});    
 
 onMounted(() => {
     grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
@@ -62,7 +71,7 @@ onMounted(() => {
         if (parentEl) {
             parentEl.addEventListener('click', (event) => {
                 console.log(`parentEl click`, event);
-                selectedId.value = widget.id;
+                selectedId.value = widget.id;  // ✅ this is the key to reactivity, changing the selectedId triggers the computed to re-run
                 deselectAll();
                 parentEl.classList.add('selected');
                 info.value = `Widget ${widget.id} selected`;
@@ -70,10 +79,7 @@ onMounted(() => {
         }
     };
 
-    const gridElement = document.querySelector('.grid-stack');
-    if (gridElement) {
-        gridElement.addEventListener('click', handleGridClick);
-    }
+    document.querySelector('.grid-stack')?.addEventListener('click', handleGridClick);
 
     grid.load(items);
 });
