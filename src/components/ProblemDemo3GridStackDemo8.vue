@@ -1,24 +1,22 @@
 <template>
     <h1>Chained computed Reactivity and selection - GridStack.js with Vue.js</h1>
-    <p>selected: {{ selectedGridStackNode?.id }}</p>
-    <p v-if="selectedGridStackNode">selectedGridStackNode x: {{ selectedGridStackNode?.x }} y: {{ selectedGridStackNode?.y }}</p>
+    <p>selectedId: {{ selectedId }} selectedGridStackNode.id: {{ selectedGridStackNode?.id }}</p>
+    <p v-if="selectedGridStackNode">selectedGridStackNode.x: {{ selectedGridStackNode?.x }} y: {{
+        selectedGridStackNode?.y }}</p>
     <p v-else>no node selected</p>
     <button type="button"
-        @click="addNewWidget">Add Widget</button> <span class="info">{{ info }}</span>
+        @click="addNewWidget">Add Widget</button>
     <div class="grid-stack"
         id="demo1-grid"></div>
-    <!-- </main> -->
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue';
-import { GridStack } from 'gridstack';
+import { GridStack, GridStackWidget } from 'gridstack';
 import { type GridStackNode } from 'gridstack'
 
-let count = ref(0);
-let info = ref("");
-let timerId = null;
-let grid: GridStack | null = null; // DO NOT use ref(null) as proxies GS will break all logic when comparing structures... see https://github.com/gridstack/gridstack.js/issues/2115
+let nextId = ref(0);
+let grid: GridStack | null = null;
 const items = [
     { x: 2, y: 1, h: 2, content: 'hi', id: '1' },
     { x: 2, y: 4, w: 3, id: '2' },
@@ -28,61 +26,45 @@ const items = [
 ];
 const selectedId = ref('');
 
-const selectedGridStackNode = computed < GridStackNode | null > (() => {
+const selectedGridStackNode = computed<GridStackNode | null>(() => {
     console.log(`  selectedGridStackNode being computed`);
-
-    // THIS FAILS TO BE REACTIVE
-    // return grid?.engine.nodes.find(node => node.id === selectedId.value) || null; // 'find' breaks reactivity
-
-    // THIS FAILS TO BE REACTIVE
-    // const result = grid?.engine.nodes.find(node => node.id === selectedId.value);
-    // return result;
-
-    // THIS WORKS
     const currentSelectedId = selectedId.value;  // explicit dependency NEEDED!!
     return grid?.engine.nodes.find(node => node.id === currentSelectedId) || null;
-});    
+});
 
 onMounted(() => {
-    grid = GridStack.init({ // DO NOT use grid.value = GridStack.init(), see above
-        minRow: 2, // how big the initial canvas is
+    grid = GridStack.init({
+        minRow: 2,
         alwaysShowResizeHandle: false,
         cellHeight: 'auto',
-        float: false,  // false means float everything to the top
+        float: true,
         margin: 10,
-        // children: items, // if want to add items on init OPTIONAL
     });
+    nextId.value = items.length + 1;
 
     grid.on("change", function (event, items) {
         console.log("change", items);
+        // ❌ this doesn't trigger the computed
     });
     grid.on("dragstop", function (event, element) {
         const node = element.gridstackNode;
-        info.value = `you just dragged node #${node.id} to ${node.x},${node.y} good job!`;
     });
-    count.value = items.length + 1; // start id counter at the length of the items array
-
-    GridStack.renderCB = function (el: HTMLElement, widget: GridStackWidgetExt) {
-        // gridItemEl  div.grid-stack-item            (parent of el)
-        // el          div.grid-stack-item-content
-        console.log(`GridStack.renderCB`, el, widget);
-
-        const parentEl: HTMLElement | null = el.closest('.grid-stack-item');
-        if (parentEl) {
-            parentEl.addEventListener('click', (event) => {
-                console.log(`parentEl click`, event);
-                selectedId.value = widget.id;  // ✅ this is the key to reactivity, changing the selectedId triggers the computed to re-run
-                deselectAll();
-                parentEl.classList.add('selected');
-                info.value = `Widget ${widget.id} selected`;
-            });
-        }
+    GridStack.renderCB = function (el: HTMLElement, widget: GridStackWidget) {
+        el.closest('.grid-stack-item')?.addEventListener('click', (event) => handleItemClick(event, el, widget));
     };
-
     document.querySelector('.grid-stack')?.addEventListener('click', handleGridClick);
-
     grid.load(items);
 });
+
+const handleItemClick = (event: Event, el: HTMLElement, widget: GridStackWidget) => {
+    console.log(`Item click`, event);
+    const parentEl: HTMLElement | null = el.closest('.grid-stack-item');
+    if (widget.id && parentEl) {
+        selectedId.value = widget.id;  // ✅ this is the key to reactivity, changing the selectedId triggers the computed to re-run
+        deselectAll();
+        parentEl.classList.add('selected');
+    }
+};
 
 const handleGridClick = (event: Event) => {
     const target = event.target as HTMLElement;
@@ -93,15 +75,15 @@ const handleGridClick = (event: Event) => {
 };
 
 function addNewWidget() {
-    const node = items[count.value] || {
+    const node = items[nextId.value] || {
         x: Math.round(12 * Math.random()),
         y: Math.round(5 * Math.random()),
         w: Math.round(1 + 3 * Math.random()),
         h: Math.round(1 + 3 * Math.random()),
     };
-    node.id = String(count.value++)
+    node.id = String(nextId.value++)
     node.content = node.id
-    grid.addWidget(node);
+    grid?.addWidget(node);
     selectedId.value = node.id;
 }
 
@@ -110,27 +92,10 @@ const deselectAll = () => {
     const els = grid.el.querySelectorAll('.grid-stack-item');
     els.forEach(el => el.classList.remove('selected'));
 };
-
-watch(info, (newVal) => {
-    if (newVal.length === 0) return;
-
-    window.clearTimeout(timerId);
-    timerId = window.setTimeout(() => {
-        info.value = "";
-    }, 2000);
-});
 </script>
 
 <style>
 @import '../assets/demo.css';
-
-.info {
-    background-color: pink;
-    color: black;
-    font-size: 0.8em;
-    margin-left: 1em;
-}
-
 
 .grid-stack-item .grid-stack-item-content {
     border: 2px solid transparent;
