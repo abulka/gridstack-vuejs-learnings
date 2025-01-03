@@ -5,6 +5,7 @@
         selectedGridStackNode?.y }}</p>
     <p v-else>no node selected</p>
     <!-- <p>updateTrigger {{ updateTrigger }}</p> -->
+    <p>computed3 {{ computed3?.x }} {{ computed3?.y  }}</p>
     <button type="button"
         @click="addNewWidget">Add Widget</button>
     <div class="grid-stack"
@@ -66,6 +67,13 @@ const selectedGridStackNode = computed<GridStackNode | null>(() => {
     // even though this computed may finally trigger ok, its not actually
     // re-rendering the UI unless we return a new object
     return { x: result?.x, y: result?.y, id: result?.id };  // this is a new object
+});
+
+// Question - Will this also be triggered because selectedGridStackNode is triggered? YES
+// Question - Do we need to return a new object here? NO
+const computed3 = computed<GridStackNode | null>(() => {
+    console.log(`  computed3 being computed`);
+    return selectedGridStackNode.value;
 });
 
 onMounted(() => {
